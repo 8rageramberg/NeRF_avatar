@@ -1,0 +1,25 @@
+# Bytecode and caches
+__pycache__/
+*.py[cod]
+
+# Virtual environments
+.env
+.venv
+env/
+venv/
+
+# Editor settings
+.idea/
+.vscode/
+
+# Training and dataset outputs
+runs/
+logs/
+data/
+*.pt
+preview_*.png
+
+# COLMAP artifacts
+*.db
+colmap_sparse*/
+colmap_text*/
