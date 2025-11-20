@@ -16,6 +16,7 @@ LOGGER = logging.getLogger(__name__)
 
 
 def parse_args():
+    # Define CLI arguments for training a NeRF on a turntable dataset.
     parser = argparse.ArgumentParser(description="Tiny NeRF for person turntable.")
     parser.add_argument("--data_root", required=True, type=Path)
     parser.add_argument("--out", required=True, type=Path)
@@ -40,6 +41,7 @@ def parse_args():
 
 
 def main():
+    # End-to-end training loop: load data, build model, optimize, and save previews.
     args = parse_args()
     logging.basicConfig(level=logging.INFO)
     device = torch.device(args.device if torch.cuda.is_available() or args.device == "cpu" else "cpu")
@@ -143,6 +145,7 @@ def save_preview(
     out_path: Path,
     n_batches: int = 32,
 ):
+    # Render a full-frame preview from the current model state.
     out_path.parent.mkdir(parents=True, exist_ok=True)
     with torch.no_grad():
         raysampler = renderer.raysampler

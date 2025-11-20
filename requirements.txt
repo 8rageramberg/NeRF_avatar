@@ -1,0 +1,21 @@
+numpy
+scipy
+scikit-image
+pillow
+imageio
+imageio-ffmpeg
+opencv-python
+matplotlib
+tqdm
+torch>=2.0
+torchvision
+pytorch3d; platform_system != "Darwin"
+# macOS users: install PyTorch3D from source (see README).
+lpips
+mediapipe
+pytest
+pytest-cov
+black
+isort
+flake8
+mypy

@@ -10,6 +10,7 @@ from pytorch3d.renderer import PerspectiveCameras
 
 
 def load_images(images_dir: Path) -> Tuple[List[Path], np.ndarray]:
+    # Load RGB images from a directory and return paths plus stacked numpy array.
     paths = sorted(p for p in images_dir.iterdir() if p.suffix.lower() in {".jpg", ".jpeg", ".png"})
     if not paths:
         raise FileNotFoundError(f"No images found in {images_dir}")
@@ -18,6 +19,7 @@ def load_images(images_dir: Path) -> Tuple[List[Path], np.ndarray]:
 
 
 def parse_colmap(text_dir: Path) -> Tuple[Dict[int, dict], Dict[int, dict]]:
+    # Parse COLMAP text files into camera and image dictionaries.
     cameras = {}
     images = {}
     with (text_dir / "cameras.txt").open() as fh:
@@ -51,6 +53,7 @@ def parse_colmap(text_dir: Path) -> Tuple[Dict[int, dict], Dict[int, dict]]:
 
 
 def quaternion_to_rotation(qvec: Tuple[float, float, float, float]) -> torch.Tensor:
+    # Convert COLMAP quaternion into a rotation matrix.
     qw, qx, qy, qz = qvec
     return torch.tensor(
         [
@@ -63,6 +66,7 @@ def quaternion_to_rotation(qvec: Tuple[float, float, float, float]) -> torch.Ten
 
 
 def _intrinsics(cam: dict) -> Tuple[float, float, float, float]:
+    # Extract fx, fy, cx, cy from the COLMAP camera model.
     params = cam["params"]
     model = cam["model"]
     if model in ("SIMPLE_PINHOLE", "SIMPLE_RADIAL"):
@@ -82,6 +86,7 @@ def build_cameras(
     images_dict: Dict[int, dict],
     device: torch.device,
 ) -> PerspectiveCameras:
+    # Build PyTorch3D PerspectiveCameras from COLMAP metadata.
     R_list = []
     T_list = []
     focal_list = []
@@ -128,6 +133,7 @@ def build_cameras(
 
 
 def load_session(path: Path, device: torch.device, masks_dir: Optional[Path] = None):
+    # Load a COLMAP session: images, cameras, and optional foreground masks.
     path = Path(path)
     images_dir = path / "images"
     colmap_dir = path / "colmap_text"

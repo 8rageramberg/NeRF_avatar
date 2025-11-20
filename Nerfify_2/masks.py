@@ -18,6 +18,7 @@ _WEIGHTS = DeepLabV3_ResNet50_Weights.DEFAULT
 
 
 def _load_model(device: torch.device):
+    # Lazy-load the DeepLabV3 model onto the requested device.
     global _MODEL
     if _MODEL is None:
         LOGGER.info("Loading DeepLabV3 weights")
@@ -27,6 +28,7 @@ def _load_model(device: torch.device):
 
 
 def segment(image: Image.Image, device: str, threshold: float) -> Image.Image:
+    # Run person segmentation on a PIL image and return a binary mask.
     torch_device = torch.device(device)
     model = _load_model(torch_device)
     preprocess = _WEIGHTS.transforms()
@@ -40,6 +42,7 @@ def segment(image: Image.Image, device: str, threshold: float) -> Image.Image:
 
 
 def main():
+    # CLI entry point for generating masks for all images in a directory.
     parser = argparse.ArgumentParser(description="Generate person masks.")
     parser.add_argument("images_dir", type=Path)
     parser.add_argument("--out", required=True, type=Path)

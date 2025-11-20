@@ -18,6 +18,7 @@ class HarmonicEmbedding(torch.nn.Module):
         )
 
     def forward(self, x):
+        # Sin/cos positional encoding for 3D coordinates.
         embed = (x[..., None] * self.frequencies).view(*x.shape[:-1], -1)
         return torch.cat((embed.sin(), embed.cos()), dim=-1)
 
@@ -47,10 +48,12 @@ class NeuralRadianceField(torch.nn.Module):
         self.density_layer[0].bias.data[0] = -1.5
 
     def _get_densities(self, features):
+        # Map MLP features to volumetric density values.
         raw = self.density_layer(features)
         return 1 - (-raw).exp()
 
     def _get_colors(self, features, rays_directions):
+        # Predict colors conditioned on view direction embeddings.
         spatial_size = features.shape[:-1]
         rays_directions_normed = torch.nn.functional.normalize(rays_directions, dim=-1)
         rays_embedding = self.harmonic_embedding(rays_directions_normed)
@@ -61,6 +64,7 @@ class NeuralRadianceField(torch.nn.Module):
         return self.color_layer(color_input)
 
     def forward(self, ray_bundle: RayBundle, **kwargs):
+        # Full-field forward pass for a batch of rays.
         points_world = ray_bundle_to_ray_points(ray_bundle)
         embeds = self.harmonic_embedding(points_world)
         features = self.mlp(embeds)
@@ -69,6 +73,7 @@ class NeuralRadianceField(torch.nn.Module):
         return densities, colors
 
     def batched_forward(self, ray_bundle: RayBundle, n_batches: int = 16, **kwargs):
+        # Memory-friendly forward pass that splits rays into batches.
         n_pts_per_ray = ray_bundle.lengths.shape[-1]
         spatial_size = [*ray_bundle.origins.shape[:-1], n_pts_per_ray]
         tot_samples = ray_bundle.origins.shape[:-1].numel()
@@ -93,6 +98,7 @@ class NeuralRadianceField(torch.nn.Module):
 
 
 def make_implicit_renderer(image_height, image_width, n_pts_per_ray, min_depth, max_depth, n_rays_per_image):
+    # Build Monte Carlo sampler and full raster renderers for training/previews.
     raysampler_mc = MonteCarloRaysampler(
         min_x=-1,
         max_x=1,
