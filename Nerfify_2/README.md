@@ -96,3 +96,10 @@ Sample Slurm scripts live here:
 They show how to run COLMAP, optional masking, and training on a cluster. The
 `sbatch_session12_baseline.sbatch` file includes extra `--lambda_*` flags that
 are not defined in `train.py`; remove those flags before running it.
+
+## Appendix: Unused lambda flags
+An earlier experiment added extra density regularizer flags (`--lambda_bg_density`,
+`--lambda_fg_density`, `--lambda_global_density`) in `sbatch_session12_baseline.sbatch`.
+We did not integrate these into `train.py`, and the experiment was dropped. The current
+code uses only the built-in light density penalty and `--mask_weight`. If you try to run
+the script with those lambda flags, argparse will error on unrecognized arguments.
